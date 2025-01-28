@@ -31,13 +31,34 @@ const Login = async (req, res) => {
         const token = await jwt.sign({ userId: findUser._id}, process.env.JWT_SECRET, { expiresIn: "2d" });
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true,
+            secure: false,
             maxAge: 2*24*3600*1000
         })
         res.status(200).json({ success: true, message: "User logged in successfully", token, User: findUser });
     }catch(error){
         console.log(`Error: ${error.message}`);
     }
+};
+
+const Logout = async (req, res) => {
+    try{
+        res.clearCookie("token");
+        return res.status(200).json({ success: true, message: "User logged out successfully" });
+    }catch(error){
+        console.log(`Error: ${error.message}`);
+    }   
 }
 
-export { Register, Login };
+const isLogin = async (req, res, next) => {
+    try {
+        const UserId = req.userId;
+        const user = await UserModel.findById(UserId);
+        if(!user) return res.status(401).json({ message: "Unauthorized", isLoggedIn: false });
+
+        res.status(200).json({ success: true, message: "User is authenticated", User: user, isLoggedIn: true });
+    } catch (error) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+};
+
+export { Register, Login, Logout, isLogin };
