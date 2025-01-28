@@ -31,7 +31,12 @@ const UpdateNotes = async (req, res) => {
         if(userId.toString() !== NotesUserId) {
             return res.status(401).json({ message: "You are not authorized to update this notes" });
         }
-        console.log("NotesUSerId", NotesUserId);
+        const UpdateNotes = await NotesModel.findByIdAndUpdate(
+            {_id:NotesId},
+            {title},
+            {new:true}
+        );
+        
         res.status(201).json({ message: "Notes updated successfully" });
         
     } catch (error) {

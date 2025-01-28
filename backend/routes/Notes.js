@@ -5,6 +5,6 @@ import { TokenVerification } from '../middlewares/TokenVerification.js';
 const notesRouter = express.Router();
 
 notesRouter.get('/createNotes', TokenVerification, createNotes);
-notesRouter.put('/updateNotes/:id', UpdateNotes);
+notesRouter.put('/updateNotes/:id', TokenVerification, UpdateNotes);
 
 export default notesRouter;
