@@ -44,4 +44,29 @@ const UpdateNotes = async (req, res) => {
     }
 };
 
-export { createNotes, UpdateNotes };
+const deleteNotes = async (req, res) => {
+    try{
+        const userId = req.userId;
+        const NotesId = req.params.id;
+        const findNotes = await NotesModel.findById(NotesId);
+        if(userId.toString() !== findNotes.userId.toString()){
+            return res.status(401).json({ message: "You are not authorized to delete this notes" });
+        }
+        const deleteNotes = await NotesModel.findByIdAndDelete(NotesId);
+        res.status(201).json({ message: "Notes deleted successfully" }); 
+    }catch(error){
+        res.status(404).json({ message: error.message });   
+    }
+};
+
+const getNotes = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const Notes = await NotesModel.find({userId:userId});
+        res.status(200).json({ success:true ,Notes });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+};
+
+export { createNotes, UpdateNotes, deleteNotes, getNotes };
