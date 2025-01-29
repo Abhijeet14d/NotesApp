@@ -3,21 +3,26 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const Register = async (req, res) => {
-  try{
-    const { username, email, password } = req.body;
-    if(!username || !email || !password) return res.status(400).json({ message: "All fields are required" });
-    const oldUser = await UserModel.findOne({ email });
-    if(oldUser) return res.status(400).json({ message: "User already exists" });
-
-    const hasedPassword = await bcrypt.hashSync(password, 10);
-
-    const newUser = await UserModel({ username, email, password: hasedPassword });
-    newUser.save();
-    res.status(201).json({ success: true, message: "User created successfully", User:newUser  });
-  }catch(error){
-    console.log(`Error: ${error.message}`);
-  }
-}
+    try {
+      const { username, email, password } = req.body;
+      if (!username || !email || !password) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+      const oldUser = await UserModel.findOne({ email });
+      if (oldUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      const newUser = new UserModel({ username, email, password: hashedPassword });
+      await newUser.save();
+      res.status(201).json({ success: true, message: "User created successfully", user: newUser });
+    } catch (error) {
+      console.log(`Error: ${error.message}`);
+      res.status(500).json({ message: "Server error" });
+    }
+};
 
 const Login = async (req, res) => {
     try{
